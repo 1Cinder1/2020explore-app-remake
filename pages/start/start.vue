@@ -23,9 +23,20 @@
 			uni.getStorage({
 				key:'uaa_token',
 				success: () => {
-					uni.navigateTo({
-						url:'/pages/home/home'
-					})
+					let expireTime =uni.getStorageSync("token_expire_time")
+					if(expireTime <= Date.parse(new Date())){
+						uni.showToast({
+							icon:"none",
+							title:"登录已过期，请重新登录"
+						})
+						uni.navigateTo({
+							url:"/pages/start/start"
+						})
+					}else{
+						uni.navigateTo({
+							url:'/pages/home/home'
+						})
+					}
 				}
 			})
 		},

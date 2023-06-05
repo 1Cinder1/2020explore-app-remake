@@ -17,7 +17,6 @@ const actions={
 	//发送request请求，获取到数据之后进行vuex数据共享
 	async getUserInfo({commit},data){
 		let result = await getUserInfo(data)
-		console.log(result)
 		if(result.code==1000){
 			commit('GETUSERINFO',result.data)
 			uni.setStorage({
@@ -31,16 +30,19 @@ const actions={
 	},
 	async getUserToken({commit},data){
 		let result = await getUserInfo(data)
-		console.log(result)
 		if(result.code==1000){
 			commit('GETUSERTOKEN',`bearer ${result.data.access_token}`)
 			uni.setStorage({
 				key:'uaa_token',
 				data:`bearer ${result.data.access_token}`
 			})
-			return 'ok'
+			uni.setStorage({
+				key:"token_expire_time",
+				data: Date.parse(new Date())+result.data.expires_in
+			})
+			return result
 		}else{
-	        return Promise.reject(new Error('faile'))
+	        return Promise.reject(result)
 	    }
 	},
 }

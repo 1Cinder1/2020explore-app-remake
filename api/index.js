@@ -1,8 +1,10 @@
 import store from '../store/index.js'
 const url_all = {
 	// #ifdef H5
-	'DEV': '/uaa',
+	
+	'DEV': 'http://localhost:9013/uaa',
 	// #endif
+	
 	// #ifdef APP
 	'DEV': 'http://60.204.146.209:9013/uaa', // 开发
 	// #endif

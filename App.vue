@@ -1,9 +1,27 @@
 <script>
 	export default {
 		onLaunch: function() {
-			uni.removeStorage({
-				key:"uaa_token"
-			})
+			// let token=uni.getStorageSync("uaa_token")
+			// if(token == ""){
+			// 	uni.showToast({
+			// 		icon:'none',
+			// 		title:"未登录，请先登录"
+			// 	})
+			// 	uni.navigateTo({
+			// 		url:"/pages/start/start"
+			// 	})
+			// }else{
+			// 	let expireTime =uni.getStorageSync("token_expire_time")
+			// 	if(expireTime <= Date.parse(new Date())){
+			// 		uni.showToast({
+			// 			icon:"none",
+			// 			title:"登录已过期，请重新登录"
+			// 		})
+			// 		uni.navigateTo({
+			// 			url:"/pages/start/start"
+			// 		})
+			// 	}
+			// }
 			console.log('App Launch')
 		},
 		onShow: function() {

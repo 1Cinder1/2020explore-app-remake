@@ -156,37 +156,29 @@
 				heartPercent: 71.094,
 				strokeOption: {
 					xAxis: {
-						data: ['4-20', '4-19', '4-18', '4-17', '4-16']
+						data: []
 					},
 					yAxis: {
 						position: 'right'
 					},
 					series: [{
-						type: 'candlestick',
+						type: 'line',
 						data: [
-							[20, 34, 10, 38],
-							[40, 35, 30, 50],
-							[31, 38, 33, 44],
-							[38, 15, 5, 42],
-							[31, 38, 33, 44]
+							
 						]
 					}]
 				},
 				heartOption: {
 					xAxis: {
-						data: ['4-20', '4-19', '4-18', '4-17', '4-16']
+						data: []
 					},
 					yAxis: {
 						position: 'right'
 					},
 					series: [{
-						type: 'candlestick',
+						type: 'line',
 						data: [
-							[15, 30, 9, 44],
-							[40, 35, 30, 50],
-							[31, 20, 33, 44],
-							[38, 15, 5, 42],
-							[31, 38, 33, 44]
+							
 						]
 					}]
 				},
@@ -257,25 +249,42 @@
 				}, 50)
 			},
 			gotostroke(){
-				console.log("qq")
 				uni.navigateTo({
 					url:"/pages/stroke/stroke"
 				})
 			},
 			async getStrokePredictHistory(){
 				let result = await this.$requests.getStrokePredictHistory()
-				if(result.code==5000){
+				if(result.success == 1){
+					result.data.forEach((item,index)=>{
+						this.strokeOption.series[0].data.push(item.stokePredict)
+						let stringList= item.createTime.split("-")
+						let date= stringList[2].split(" ")
+						let month = stringList[1]
+						this.strokeOption.xAxis.data.push(month+"-"+date[0])
+					})
+				}
+				if(result.success==0){
 					this.strokePercent=0
 				}else{
-					this.strokePercent=result.data
+					this.strokePercent=result.data[0].stokePredict
 				}
 			},
 			async getHeartPredictHistory(){
 				let result = await this.$requests.getHeartPredictHistory()
-				if(result.code==5000){
+				if(result.success == 1){
+					result.data.forEach((item,index)=>{
+						this.heartOption.series[0].data.push(item.stokePredict)
+						let stringList= item.createTime.split("-")
+						let date= stringList[2].split(" ")
+						let month = stringList[1]
+						this.heartOption.xAxis.data.push(month+"-"+date[0])
+					})
+				}
+				if(result.success==0){
 					this.heartPercent=0
 				}else{
-					this.heartPercent=result.data
+					this.heartPercent=result.data[0].stokePredict
 				}
 				
 			},

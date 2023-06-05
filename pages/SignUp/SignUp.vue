@@ -3,50 +3,50 @@
 		<view class="box">
 			<view class="title">
 				<view>
-					Create Account
+					账号注册
 				</view>
 				<view>
 					<view>
-						Already have an account?
+						已经拥有账户?
 					</view>
 					<view class="toSignUp" @click="toSignIn">
-						Sign In!
+						登录!
 					</view>
 				</view>
 			</view>
 			<uni-forms ref="forms" class="form" @submit="formSubmit" :rules="rules" :modelValue="FormData"
 				label-width="350rpx" label-position="top">
-				<uni-forms-item class="formItem" label="Usernmae" name="Username">
+				<uni-forms-item class="formItem" label="昵称" name="Username">
 					<view class="formIpt">
-						<input type="text" v-model="FormData.Username" placeholder="Please enter username">
+						<input type="text" v-model="FormData.Username" placeholder="在此输入昵称">
 					</view>
 				</uni-forms-item>
-				<uni-forms-item class="formItem" name="Email" label="Email">
+				<uni-forms-item class="formItem" name="Email" label="邮箱地址">
 					<view class="formIpt">
-						<input type="text" v-model="FormData.Email" placeholder="Please enter email">
+						<input type="text" v-model="FormData.Email" placeholder="在此输入邮箱">
 					</view>
 				</uni-forms-item>
-				<uni-forms-item class="formItem" name="EmailCode" label="Email verification code">
+				<uni-forms-item class="formItem" name="EmailCode" label="邮箱验证码">
 					<view class="formIpt" style="display: flex;">
-						<input style="width: 200rpx;" type="number" v-model="FormData.EmailCode"
-							placeholder="Please enter emailCode">
+						<input style="width: 350rpx;" type="number" v-model="FormData.EmailCode"
+							placeholder="在此输入邮箱验证码">
 						<button class="EmailCodeBtn" :class="{active:send}" :disabled="send"
 							@click="getEmailCode">{{EmailCodeIptContent}}</button>
 					</view>
 
 				</uni-forms-item>
-				<uni-forms-item class="formItem" name="Password" label="Password">
+				<uni-forms-item class="formItem" name="Password" label="密码">
 					<view class="formIpt">
-						<input type="password" v-model="FormData.Password" placeholder="Please enter password">
+						<input type="password" v-model="FormData.Password" placeholder="在此输入密码">
 					</view>
 				</uni-forms-item>
-				<uni-forms-item class="formItem" name="Cofirmpassword" label="Cofirm password">
+				<uni-forms-item class="formItem" name="Cofirmpassword" label="确认密码">
 					<view class="formIpt">
 						<input type="password" v-model="FormData.Cofirmpassword"
-							placeholder="Please confirm the password">
+							placeholder="再次确认密码">
 					</view>
 				</uni-forms-item>
-				<button class="submitBtn" form-type="submit" @click="formSubmit">Sign Up</button>
+				<button class="submitBtn" form-type="submit" @click="formSubmit">注册</button>
 			</uni-forms>
 
 		</view>
@@ -54,6 +54,7 @@
 </template>
 <script>
 	import {getEmailCode} from "@/api/request.js"
+	import {userRegister} from "@/api/request.js"
 	export default {
 		data() {
 			return {
@@ -68,34 +69,34 @@
 					Username: {
 						rules: [{
 							required: true,
-							errorMessage: 'Username cannot be empty'
+							errorMessage: '昵称不能为空'
 						}]
 					},
 					Email: {
 						rules: [{
 							required: true,
-							errorMessage: 'Email cannot be empty'
+							errorMessage: '邮箱不能为空'
 						}]
 					},
 					EmailCode: {
 						rules: [{
 							required: true,
-							errorMessage: 'code cannot be empty'
+							errorMessage: '邮箱验证码不能为空'
 						}, {
 							format: 'number',
-							errorMessage: 'Code can only be numbers'
+							errorMessage: '邮箱验证码只能是数字'
 						}]
 					},
 					Password: {
 						rules: [{
 							required: true,
-							errorMessage: 'Password cannot be empty'
+							errorMessage: '密码不能为空'
 						}]
 					},
 					Cofirmpassword: {
 						rules: [{
 								required: true,
-								errorMessage: 'Password cannot be empty'
+								errorMessage: '请再次确认密码'
 							},
 							{
 								validateFunction: (rules,value,callback) => {
@@ -111,7 +112,7 @@
 				},
 				send: false,
 				countDown: 60,
-				EmailCodeIptContent: "Send verification"
+				EmailCodeIptContent: "Send"
 			}
 		},
 		onReady() {
@@ -121,33 +122,48 @@
 		methods: {
 			formSubmit(e) {
 				this.$refs.forms.validate().then(res => {
-					console.log('success', res);
-					uni.showToast({
-						title: `校验通过`,
-						success: async () => {
-							//发送request请求，这里不许用进行数据储存，所有我们直接发送request请求
-							try{
-								let result = await this.$requests.userRegister({
+					userRegister({
 									email:res.Email,
 									emailCode:res.EmailCode,
 									password:res.Password
+								}).then(res=>{
+									if(res.success == 0){
+										uni.showToast({
+											icon:"none",
+											title:res.message
+										})
+									}else{
+										uni.navigateTo({
+											url: '/pages//SignIn/SignIn'
+										})
+									}
+								}).catch(err=>{
+									console.log(err)
 								})
-								if(result.success==1){
-								//成功后跳转到start界面
-								uni.navigateTo({
-									url: '/pages/start/start'
-								})	
-								}
+					// uni.showToast({
+					// 	title: `校验通过`,
+					// 	success: async () => {
+					// 		//发送request请求，这里不许用进行数据储存，所有我们直接发送request请求
+					// 		try{
+					// 			let result = await this.$requests.userRegister({
+					// 				email:res.Email,
+					// 				emailCode:res.EmailCode,
+					// 				password:res.Password
+					// 			})
+					// 			if(result.success==1){
+					// 			//成功后跳转到start界面
+					// 			uni.navigateTo({
+					// 				url: '/pages/start/start'
+					// 			})
+					// 			}
 								
-							}catch(e){
-								//TODO handle the exception
-								alert(e.message)
-							}
+					// 		}catch(e){
+					// 			//TODO handle the exception
+					// 			alert(e.message)
+					// 		}
 							
-						}
-					})
-				}).catch(err => {
-					console.log('err', err);
+					// 	}
+					// })
 				})
 			},
 			//跳转到Sign In
@@ -243,7 +259,9 @@
 	}
 
 	.EmailCodeBtn {
-		width: 400rpx;
+		position: absolute;
+		right: 50rpx;
+		width: 150rpx;
 		border-radius: 20rpx;
 		background-color: #9584ff;
 		color: white;

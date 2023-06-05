@@ -10,7 +10,6 @@ const mutations={
 const actions={
 	async getArticleList({commit}){
 		let result = await getArticleList()
-		console.log(result)
 		if(result.code==1000){
 			commit('GETARTICLELIST',result.data)
 			return 'ok'

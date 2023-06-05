@@ -3,14 +3,14 @@
 		<view class="box">
 			<view class="title">
 				<view>
-					Sign In
+					登录
 				</view>
 				<view>
 					<view>
-						Don'n have an account?
+						还没有账号?
 					</view>
 					<view class="toSignUp" @click="toSignUp">
-						Sign Up!
+						注册一个!
 					</view>
 				</view>
 			</view>
@@ -19,24 +19,24 @@
 
 				<uni-forms-item class="formItem" name="Email" label="Email">
 					<view class="formIpt">
-						<input type="text" v-model="FormData.Email" placeholder="Please enter email">
+						<input type="text" v-model="FormData.Email" placeholder="在此输入邮箱">
 					</view>
 				</uni-forms-item>
 				<uni-forms-item class="formItem" name="Password" label="Password">
 					<view class="formIpt">
-						<input type="password" v-model="FormData.Password" placeholder="Please enter password">
+						<input type="password" v-model="FormData.Password" placeholder="在此输入密码">
 					</view>
 				</uni-forms-item>
 				<button class="submitBtn" form-type="submit" @click="formSubmit">Sign In</button>
 				<label>
-					<checkbox value="" style="transform:scale(0.7)" /><text style="font-size: 25rpx;">Forgot your
-						Password?</text>
+					<checkbox value="" checked="isRememberMe" style="transform:scale(0.7)" @click="rememberMe" /><text style="font-size: 25rpx;">记住我</text>
 				</label>
 			</uni-forms>
 		</view>
 	</view>
 </template>
 <script>
+	import getUserInfo from "@/api/request.js"
 	export default {
 		data() {
 			return {
@@ -44,53 +44,71 @@
 					Email: '',
 					Password: ''
 				},
+				isRememberMe:true,
 				rules: {
 					Email: {
 						rules: [{
 							required: true,
-							errorMessage: 'Email cannot be empty'
+							errorMessage: '账号不能为空'
 						}]
 					},
 					Password: {
 						rules: [{
 							required: true,
-							errorMessage: 'Password cannot be empty'
+							errorMessage: '密码不能为空'
 						}]
 					}
 				},
 			}
 		},
+		created() {
+			this.FormData.Email =uni.getStorageSync("username")
+			this.FormData.Password = uni.getStorageSync("password")
+			
+		},
 		methods: {
+			rememberMe(){
+				this.isRememberMe = !this.isRememberMe
+			},
 			formSubmit(e) {
-				this.$refs.forms.validate().then(res => {
-					// console.log('success', res);
-					uni.showToast({
-						title: `校验通过`,
-						success: async () => {
-							//发送actions
-							try {
-								await this.$store.dispatch('getUserToken', {
-									username: res.Email,
-									password: res.Password
-								})
-								//成功后跳转到start界面
+				this.$refs.forms.validate().then(
+					res => {
+						this.$store.dispatch('getUserToken', {
+							username: res.Email,
+							password: res.Password
+						}).then(res => {
+								// //成功后跳转到start界面
 								uni.navigateTo({
 									url: '/pages/home/home'
 								})
+								if(this.isRememberMe){
+									uni.setStorage({
+										key:"username",
+										data:this.FormData.Email
+									})
+									uni.setStorage({
+										key:"password",
+										data:this.FormData.Password
+									})
+								}else{
+									uni.removeStorage({
+										key:"username"
+									})
+									uni.removeStorage({
+										key:"password"
+									})
+								}
+							},
+							err => {
+								console.log(err)
+								uni.showToast({
+									icon: "none",
+									title: err.message
 
-								
-
-							} catch (e) {
-								//TODO handle the exception
-								alert(error.message)
+								})
 							}
-
-
-						}
+						)
 					})
-				}).catch(err => {
-					console.log('err', err);
-				})
 			},
 			//跳转到Sign Up
 			toSignUp() {
